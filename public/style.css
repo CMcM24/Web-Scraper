@@ -1,0 +1,9 @@
+a {
+    color: white;
+}
+
+.jumbotron {
+    background-image: url("./nebula.jpg");
+    background-size: cover;
+    color: white;
+}
