@@ -14,12 +14,12 @@ $(document).ready(function () {
     $(document).on("click", "#saveButton", function (event) {
         event.preventDefault();
 
-        var queryID = $(this).attr("data-id");
-        console.log(queryID);
+        var id = $(this).attr("data-id");
+        console.log(id);
 
         $.ajax({
             method: "PUT",
-            url: "/entries/" + queryID
+            url: "/entries/" + id
         }).then(function (result) {
             console.log(result);
             location.reload();
@@ -43,8 +43,6 @@ $(document).ready(function () {
 
     $.getJSON("/entries", function (data) {
 
-
-
         for (let i = 0; i < data.length; i++) {
 
             var entryButton;
@@ -60,7 +58,11 @@ $(document).ready(function () {
             };
 
 
-            $("#entry-drop").append('<div class="card text-white bg-info"><img src="' + data[i].image + '" class="card-img-top" alt="..."><div class="card-body"><h5 class="card-title">' + data[i].title + '</h5><p class="card-text"><a href="' + data[i].link + '">' + data[i].link + '</a></p>' + entryButton + '</div></div>')
+            $("#entry-drop").append('<div class="card text-white bg-info"><img src="' + data[i].image + '" class="card-img-top" alt="..."><div class="card-body"><h5 class="card-title">' + data[i].title + '</h5><p class="card-text"><a href="' + data[i].link + '">' + data[i].link + '</a></p>' + entryButton + '</div></div>');
+
+            if(data[i].saved){
+                $("#saved-drop").append('<div class="card text-white bg-info"><img src="' + data[i].image + '" class="card-img-top" alt="..."><div class="card-body"><h5 class="card-title">' + data[i].title + '</h5><p class="card-text"><a href="' + data[i].link + '">' + data[i].link + '</a></p>' + entryButton + '</div></div>');
+            }
         }
     });
 });

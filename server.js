@@ -86,15 +86,22 @@ app.post("/entires/:id", function (req, res) {
         });
 });
 
-app.put("/entires/:id", function (req, res) {
+app.put("/entries/:id", function (req, res) {
 
     var id = req.params.id;
 
-    db.Entry.updateOne(
+    db.Entry.findOne(
         { _id: id },
-        { $set: { saved: !saved } },
-        { upsert: true, multi: false }
+        // { upsert: true, multi: false }
     ).then(function (dbEntry) {
+
+        db.Entry.updateOne(
+            { _id: id },
+            { $set: { saved: !dbEntry.saved } }
+        ).then(function (result) {
+            console.log(result);
+            res.json(result);
+        });
         res.json(dbEntry);
     }).catch(function (err) {
         res.json(err);
