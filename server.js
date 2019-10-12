@@ -30,60 +30,76 @@ app.use(express.static("public"));
 mongoose.connect("mongodb://localhost/webscraperdb", { useNewUrlParser: true });
 
 
-    app.get("/scrape", function (req, res) {
-        axios.get("https://www.space.com/news").then(function (response) {
-            var $ = cheerio.load(response.data);
+app.get("/scrape", function (req, res) {
+    axios.get("https://www.space.com/news").then(function (response) {
+        var $ = cheerio.load(response.data);
 
-            $("div.listingResult").each(function (i, element) {
-                var newEntry = {};
+        $("div.listingResult").each(function (i, element) {
+            var newEntry = {};
 
-                newEntry.title = $(this).find("article").find("div.content").find("header").find("h3").text();
-                newEntry.link = $(this).find("a").attr("href");
-                newEntry.image = $(this).find("div.image").find("img").attr("data-src");
+            newEntry.title = $(this).find("article").find("div.content").find("header").find("h3").text();
+            newEntry.link = $(this).find("a").attr("href");
+            newEntry.image = $(this).find("div.image").find("img").attr("data-src");
+            newEntry.saved = false;
 
-                db.Entry.create(newEntry).then(function (dbEntry) {
-                    console.log(dbEntry);
-                }).catch(function (err) {
-                    console.log(err);
-                });
+            db.Entry.create(newEntry).then(function (dbEntry) {
+                console.log(dbEntry);
+            }).catch(function (err) {
+                console.log(err);
             });
-
-            console.log("scrape complete");
         });
+
+        console.log("scrape complete");
     });
+});
 
 
 
-    app.get("/entries", function (req, res) {
-        db.Entry.find({}).then(function (dbEntry) {
+app.get("/entries", function (req, res) {
+    db.Entry.find({}).then(function (dbEntry) {
+        res.json(dbEntry);
+    }).catch(function (err) {
+        res.json(err);
+    });
+});
+
+
+app.get("/entries/:id", function (req, res) {
+    db.Entry.findOne({ _id: req.params.id }).populate("comment")
+        .then(function (dbEnrty) {
+            res.json(dbEnrty);
+        }).catch(function (err) {
+            res.json(err);
+        });
+});
+
+
+
+app.post("/entires/:id", function (req, res) {
+    db.Comment.create(req.body)
+        .then(function (dbComment) {
+            return db.Entry.findOneAndUpdate({ _id: req.params.id }, { note: dbComment._id }, { new: true });
+        }).then(function (dbEntry) {
             res.json(dbEntry);
         }).catch(function (err) {
             res.json(err);
         });
+});
+
+app.put("/entires/:id", function (req, res) {
+
+    var id = req.params.id;
+
+    db.Entry.updateOne(
+        { _id: id },
+        { $set: { saved: !saved } },
+        { upsert: true, multi: false }
+    ).then(function (dbEntry) {
+        res.json(dbEntry);
+    }).catch(function (err) {
+        res.json(err);
     });
-
-
-    app.get("/entries/:id", function (req, res) {
-        db.Entry.findOne({ _id: req.params.id }).populate("comment")
-            .then(function (dbEnrty) {
-                res.json(dbEnrty);
-            }).catch(function (err) {
-                res.json(err);
-            });
-    });
-
-
-
-    app.post("/articles/:id", function (req, res) {
-        db.Comment.create(req.body)
-            .then(function (dbNote) {
-                return db.Entry.findOneAndUpdate({ _id: req.params.id }, { note: dbComment._id }, { new: true });
-            }).then(function (dbEntry) {
-                res.json(dbEntry);
-            }).catch(function (err) {
-                res.json(err);
-            });
-    });
+});
 
 
 
