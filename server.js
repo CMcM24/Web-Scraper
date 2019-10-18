@@ -27,7 +27,12 @@ app.use(express.json());
 app.use(express.static("public"));
 
 // Connect to the Mongo DB
-mongoose.connect("mongodb://localhost/webscraperdb", { useNewUrlParser: true });
+
+
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/webscraperdb");
+
+
+// mongoose.connect("mongodb://localhost/webscraperdb", { useNewUrlParser: true });
 
 
 app.get("/scrape", function (req, res) {
