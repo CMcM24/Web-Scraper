@@ -41,6 +41,7 @@ app.get("/scrape", function (req, res) {
             newEntry.link = $(this).find("a").attr("href");
             newEntry.image = $(this).find("div.image").find("img").attr("data-src");
             newEntry.saved = false;
+            newEntry.comment;
 
             db.Entry.create(newEntry).then(function (dbEntry) {
                 console.log(dbEntry);
@@ -75,7 +76,7 @@ app.get("/entries/:id", function (req, res) {
 
 
 
-app.post("/entires/:id", function (req, res) {
+app.post("/entries/:id", function (req, res) {
     db.Comment.create(req.body)
         .then(function (dbComment) {
             return db.Entry.findOneAndUpdate({ _id: req.params.id }, { note: dbComment._id }, { new: true });
