@@ -11,7 +11,7 @@ var cheerio = require("cheerio");
 // Require all models
 var db = require("./models");
 
-var PORT = 3000;
+var PORT = process.env.PORT || 3000;
 
 // Initialize Express
 var app = express();
@@ -29,7 +29,7 @@ app.use(express.static("public"));
 // Connect to the Mongo DB
 
 
-mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/webscraperdb");
+mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/webscraperdb", { useNewUrlParser: true });
 
 
 // mongoose.connect("mongodb://localhost/webscraperdb", { useNewUrlParser: true });
